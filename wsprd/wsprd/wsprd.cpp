@@ -22,6 +22,11 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// ----------------------------------------
+// wsprd.exe - WSPR C decoder Windows port
+// K Atanassov, M0NKA
+// ----------------------------------------
+
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>

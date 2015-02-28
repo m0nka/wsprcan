@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,5 +48,8 @@
   <ItemGroup>
     <Library Include="..\converted_libs\libfftw3\libfftw3-3.lib" />
     <Library Include="..\converted_libs\libsndfile\libsndfile-1.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\ReadMeWin.txt" />
   </ItemGroup>
 </Project>
