@@ -43,9 +43,18 @@
 extern int mettab[2][256];
 
 char	curr_dir[260];
+
+// ----------------------------------------
+// those were originally dinamically 
+// allocated inside the actual functions. No way to 
+// compile on windows/stack overflows, etc...
+// this is temp solution, need to check if
+// the current static allocation is enough
+//
 float	ps[512][400];
 FILE	*fall_wspr, *fwsprd, *fhash;
 float	allfreqs[100];
+// ----------------------------------------
 
 int     opterr = 1,             /* if error message should be printed */
   optind = 1,             /* index into parent argv vector */
@@ -818,6 +827,8 @@ void usage(void)
     printf("       -q quick mode - doesn't dig deep for weak signals\n");
     printf("       -v verbose mode\n");
     printf("       -w wideband mode - decode signals within +/- 150 Hz of center\n");
+
+	update_log("passed arguments error!",0,0);
 }
 
 int main(int argc, char *argv[])
@@ -869,7 +880,8 @@ int main(int argc, char *argv[])
 	fall_wspr = fopen(c_temp,"ab");
     if(fall_wspr == NULL)
 	{
-		printf("unable to open all_wspr.txt\n");
+		//printf("unable to open all_wspr.txt\n");
+		update_log("unable to open all_wspr.txt",0,0);
         return 1;
 	}
 
@@ -879,8 +891,9 @@ int main(int argc, char *argv[])
 	fwsprd = fopen(c_temp,"wb");
 	if(fwsprd == NULL)
 	{
-		printf("unable to open wsprd.out\n");
-        return 1;
+		//printf("unable to open wsprd.out\n");
+        update_log("unable to open wsprd.out",0,0);
+		return 1;
 	}
 
 	while ( (c = getopt(argc, argv, "b:e:f:Hnqt:wv")) !=-1 ) 
@@ -975,7 +988,10 @@ int main(int argc, char *argv[])
         ptr_to_infile_suffix=strstr(ptr_to_infile,".wav");
         npoints=readwavfile(ptr_to_infile, idat, qdat);
         if( npoints == 1 ) 
+		{
+			update_log("unable to open wav file!",0,0);
             return 1;
+		}
         
         dialfreq=dialfreq_cmdline - (dialfreq_error*1.0e-06);
     }    
@@ -984,13 +1000,17 @@ int main(int argc, char *argv[])
         ptr_to_infile_suffix=strstr(ptr_to_infile,".c2");
         npoints = readc2file(ptr_to_infile, idat, qdat, &dialfreq);
         if( npoints == 1 )
+		{
+			update_log("unable to open c2 file!",0,0);
             return 1;
+		}
         
         dialfreq -= (dialfreq_error*1.0e-06);
     }   
 	else 
 	{
-        printf("Error: infile must have suffix .wav or .c2\n");
+        //printf("Error: infile must have suffix .wav or .c2\n");
+		update_log("Error: infile must have suffix .wav or .c2",0,0);
         return 1;
     }
 
@@ -1016,7 +1036,8 @@ int main(int argc, char *argv[])
     
 	if(nffts > 400)
 	{
-		printf("low memory!,need %d\n",nffts);
+		//printf("low memory!,need %d\n",nffts);
+		update_log("low memory allocated 1!",0,0);
 		return 1;
 	}
 
@@ -1208,7 +1229,8 @@ int main(int argc, char *argv[])
 
 	if(npk > 100)
 	{
-		printf("low memory2!\n");
+		//printf("low memory2!\n");
+		update_log("low memory allocated 2!",0,0);
 		return 1;
 	}
 
@@ -1233,17 +1255,27 @@ int main(int argc, char *argv[])
     //fall_wspr = fopen("C:\\Projects\\wsprcan\\wsprd\\Release\\ALL_WSPR.TXT","ab");
     //fwsprd = fopen("C:\\Projects\\wsprcan\\wsprd\\Release\\wsprd.out","wb");
     
-    if( usehashtable ) {
+    if( usehashtable ) 
+	{
         char line[80], hcall[12];
-        if( (fhash=fopen("hashtable.txt","r+")) ) {
-           while (fgets(line, sizeof(line), fhash) != NULL) {
+        
+		strcpy(c_temp,curr_dir);
+		strcat(c_temp,"\\hashtable.txt");
+
+		if( (fhash=fopen(c_temp,"rb")) ) 
+		{
+           while (fgets(line, sizeof(line), fhash) != NULL) 
+		   {
               sscanf(line,"%d %s",&nh,hcall);
               strcpy(*hashtab+nh*13,hcall);
            }
-        } else {
-            fhash=fopen("hashtable.txt","w+");
+        } 
+		else 
+		{
+            fhash=fopen(c_temp,"wb");
         }
-        fclose(fhash);
+        
+		fclose(fhash);
     }
     
     int uniques=0, noprint=0;
@@ -1435,8 +1467,12 @@ int main(int argc, char *argv[])
     fclose(fall_wspr);
     fclose(fwsprd);
 
-    if( usehashtable ) {
-       fhash=fopen("hashtable.txt","w");
+    if( usehashtable ) 
+	{
+		strcpy(c_temp,curr_dir);
+		strcat(c_temp,"\\hashtable.txt");
+
+       fhash=fopen(c_temp,"w");
        for (i=0; i<32768; i++) {
            if( strncmp(hashtab[i],"\0",1) != 0 ) {
                fprintf(fhash,"%5ld %s\n",i,*hashtab+i*13);
