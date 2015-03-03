@@ -25,6 +25,9 @@
 // ----------------------------------------
 // wsprd.exe - WSPR C decoder Windows port
 // K Atanassov, M0NKA
+//
+// ver 0.0.1.3
+//
 // ----------------------------------------
 
 #include <windows.h>
@@ -51,7 +54,7 @@ char	curr_dir[260];
 // this is temp solution, need to check if
 // the current static allocation is enough
 //
-float	ps[512][400];
+float	ps[512][512];
 FILE	*fall_wspr, *fwsprd, *fhash;
 float	allfreqs[100];
 // ----------------------------------------
@@ -100,7 +103,7 @@ void update_log(char *text,int val,int show_int)
 		strcat(block,": ");
 		strcat(block,text);
 		if(show_int) sprintf(block + strlen(block),"%d",val);
-		strcat(block,"\n\r");
+		strcat(block,"\r\n");
 
 		// Update file
 		fwrite ((unsigned char*)block,1, strlen(block),flog);
@@ -182,7 +185,7 @@ unsigned char pr3[162]=
     0,0,0,0,0,0,0,1,1,0,1,0,1,1,0,0,0,1,1,0,
     0,0};
 
-unsigned long readc2file(char *ptr_to_infile, double *idat, double *qdat, float *freq)
+unsigned long readc2file(char *ptr_to_infile, double *idat, double *qdat, double *freq)
 {
     //float	buffer[2*65536];
 	float			*buffer,*p;
@@ -216,7 +219,7 @@ unsigned long readc2file(char *ptr_to_infile, double *idat, double *qdat, float 
     if(nread != 1)
 		return 1;
 
-	*freq=(float)dfreq;
+	*freq = dfreq;
     
 	nread = fread(buffer,sizeof(float),2*45000,c2fh);
     //printf("read from file %d elements, of %d bytes\n",nread,sizeof(float));
@@ -850,7 +853,7 @@ int main(int argc, char *argv[])
     float			freq0[200],snr0[200],drift0[200],sync0[200];
     int				shift0[200];
     float			dt=1.0/375.0;
-    float			dialfreq_cmdline=0.0, dialfreq;
+    double			dialfreq_cmdline=0.0, dialfreq;
     float			dialfreq_error=0.0;
     float			fmin=-110, fmax=110;
     float			f1, fstep, sync1, drift1, tblank, fblank;
@@ -918,7 +921,7 @@ int main(int argc, char *argv[])
             case 'f':
 			{
                 //dialfreq_cmdline = strtof(optarg,NULL); // units of MHz
-				sscanf(optarg, "%f", &dialfreq_cmdline);
+				sscanf(optarg, "%9.7f", &dialfreq_cmdline);
                 break;
 			}
 
@@ -1034,10 +1037,11 @@ int main(int argc, char *argv[])
     fftout=(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*512);
     MYPLAN = fftw_plan_dft_1d(512, fftin, fftout, FFTW_FORWARD, FFTW_ESTIMATE);
     
-	if(nffts > 400)
+	if(nffts > 511)
 	{
 		//printf("low memory!,need %d\n",nffts);
 		update_log("low memory allocated 1!",0,0);
+		update_log("need",nffts,1);
 		return 1;
 	}
 
@@ -1227,7 +1231,7 @@ int main(int argc, char *argv[])
 	//float allfreqs[npk];
 	//float *allfreqs = (float *)malloc(npk);
 
-	if(npk > 100)
+	if(npk > 99)
 	{
 		//printf("low memory2!\n");
 		update_log("low memory allocated 2!",0,0);
@@ -1452,11 +1456,11 @@ int main(int argc, char *argv[])
                 printf("%4s %3.0f %4.1f %10.6f %2d  %-s \n",
                    uttime, snr0[j],(shift1*dt-2.0), dialfreq+(1500+f1)/1e6,
                    (int)drift1, call_loc_pow);
-                fprintf(fall_wspr,"%6s %4s %3.0f %3.0f %4.1f %10.6f  %-22s %2d %5lu %4d\n",
+                fprintf(fall_wspr,"%6s %4s %3.0f %3.0f %4.1f %10.6f  %-22s %2d %5lu %4d\r\n",
                        date,uttime,sync1*10,snr0[j],
                        shift1*dt-2.0, dialfreq+(1500+f1)/1e6,
                        call_loc_pow, (int)drift1, cycles/81, ii);
-                fprintf(fwsprd,"%6s %4s %3d %3.0f %4.1f %10.6f  %-22s %2d %5lu %4d\n",
+                fprintf(fwsprd,"%6s %4s %3d %3.0f %4.1f %10.7f  %-22s %2d %5lu %4d\n",
                         date,uttime,(int)(sync1*10),snr0[j],
                         shift1*dt-2.0, dialfreq+(1500+f1)/1e6,
                         call_loc_pow, (int)drift1, cycles/81, ii);
@@ -1475,7 +1479,7 @@ int main(int argc, char *argv[])
        fhash=fopen(c_temp,"w");
        for (i=0; i<32768; i++) {
            if( strncmp(hashtab[i],"\0",1) != 0 ) {
-               fprintf(fhash,"%5ld %s\n",i,*hashtab+i*13);
+               fprintf(fhash,"%5ld %s\r\n",i,*hashtab+i*13);
            }
        }
        fclose(fhash);
