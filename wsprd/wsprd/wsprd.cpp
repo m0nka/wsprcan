@@ -1456,11 +1456,11 @@ int main(int argc, char *argv[])
                 printf("%4s %3.0f %4.1f %10.6f %2d  %-s \n",
                    uttime, snr0[j],(shift1*dt-2.0), dialfreq+(1500+f1)/1e6,
                    (int)drift1, call_loc_pow);
-                fprintf(fall_wspr,"%6s %4s %3.0f %3.0f %4.1f %10.6f  %-22s %2d %5lu %4d\r\n",
+                fprintf(fall_wspr,"%6s %4s %3.0f %3.0f %4.1f %10.7f  %-22s %2d %5lu %4d\r\n",
                        date,uttime,sync1*10,snr0[j],
                        shift1*dt-2.0, dialfreq+(1500+f1)/1e6,
                        call_loc_pow, (int)drift1, cycles/81, ii);
-                fprintf(fwsprd,"%6s %4s %3d %3.0f %4.1f %10.7f  %-22s %2d %5lu %4d\n",
+                fprintf(fwsprd,"%6s %4s %3d %3.0f %4.1f %10.6f  %-22s %2d %5lu %4d\n",
                         date,uttime,(int)(sync1*10),snr0[j],
                         shift1*dt-2.0, dialfreq+(1500+f1)/1e6,
                         call_loc_pow, (int)drift1, cycles/81, ii);
