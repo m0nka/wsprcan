@@ -26,7 +26,7 @@
 // wsprd.exe - WSPR C decoder Windows port
 // K Atanassov, M0NKA
 //
-// ver 0.0.1.3
+// ver 0.0.1.5
 //
 // ----------------------------------------
 
@@ -774,8 +774,8 @@ void unpackpfx( int32_t nprefix, char *call)
             strncat(call,pfx,1);
         }
         else if( (nc >= 36) & (nc <= 125) ) {
-            pfx[0]=(nc-26)/10;
-            pfx[1]=(nc-26)%10;
+            pfx[0]=(nc-26)/10 + 48;
+            pfx[1]=(nc-26)%10 + 48;
             strcpy(call,tmpcall);
             strncat(call,"/",1);
             strncat(call,pfx,2);
@@ -1174,6 +1174,7 @@ int main(int argc, char *argv[])
 //  vector (should be consistent with K1JT def). 
 //
 
+	char tempb[300];
 
     int idrift,ifr,if0,ifd,k0;
     long int kindex;
@@ -1184,7 +1185,7 @@ int main(int argc, char *argv[])
         for (ifr=if0-1; ifr<=if0+1; ifr++) {
         for( k0=-10; k0<22; k0++)
         {
-            for (idrift=-4; idrift<=4; idrift++)
+            for (idrift=-4; idrift<=4; idrift++)			
             {
                 ss=0.0;
                 pow=0.0;
@@ -1216,6 +1217,11 @@ int main(int argc, char *argv[])
         if ( verbose ) {
             printf("npk %2ld snr %6.1f freq %6.1f drift %4.1f shift %5d sync %4.2f\n",
                    j,snr0[j],freq0[j],drift0[j],shift0[j],sync0[j]); }
+
+		// test
+		//sprintf(tempb,"npk %2ld snr %6.1f freq %6.1f drift %4.1f shift %5d sync %4.2f",
+        //           j,snr0[j],freq0[j],drift0[j],shift0[j],sync0[j]);
+		//update_log(tempb,0,0);
     }
 
     nbits=81;

@@ -2,7 +2,7 @@
     CONSOLE APPLICATION : wsprd Project Overview
 ========================================================================
 
-wsprd.exe - WSPR C decoder Windows port v 0.0.1.4, 03 March 2015
+wsprd.exe - WSPR C decoder Windows port v 0.0.1.5, 08 March 2015
 
 This is Windows compatible port of the K9AN C port of the WSPR decoder.
 It compilies with the free Visual Studio express. The two libs: libfftw3-3
@@ -20,6 +20,10 @@ you need runtime libs from MS site (http://www.microsoft.com/en-us/download/deta
 - Run WSPR-X as normal
 
 Releases:
+
+v 1.5, 08 March 2015
+
+- Fixed a problem that affected extended callsigns with a 2-character suffix(sync with k9an master)
 
 v 1.4, 03 March 2015
 
